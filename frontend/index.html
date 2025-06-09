@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Molpalata Web App</title>
+  <title>Молодёжная палата Некрасовки</title>
   <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -17,6 +17,13 @@
       const [events, setEvents] = React.useState([]);
       const [email, setEmail] = React.useState('');
       const [password, setPassword] = React.useState('');
+      const [showReg, setShowReg] = React.useState(false);
+      const [fullName, setFullName] = React.useState('');
+      const [birthDate, setBirthDate] = React.useState('');
+      const [phone, setPhone] = React.useState('');
+      const [username, setUsername] = React.useState('');
+      const [regEmail, setRegEmail] = React.useState('');
+      const [regPassword, setRegPassword] = React.useState('');
 
       React.useEffect(() => {
         if (!token) return;
@@ -48,6 +55,30 @@
           });
       };
 
+      const register = () => {
+        fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            full_name: fullName,
+            birth_date: birthDate,
+            phone,
+            username,
+            email: regEmail,
+            password: regPassword
+          })
+        })
+          .then(r => r.json())
+          .then(data => {
+            if (data.status === 'ok') {
+              alert('Регистрация успешно отправлена');
+              setShowReg(false);
+            } else {
+              alert(data.error || 'Ошибка регистрации');
+            }
+          });
+      };
+
       const logout = () => {
         localStorage.removeItem('token');
         setToken(null);
@@ -55,12 +86,32 @@
       };
 
       if (!token) {
+        if (showReg) {
+          return (
+            <div className="space-y-2">
+              <h1 className="text-xl font-bold">Регистрация</h1>
+              <input className="border p-1 w-full" placeholder="ФИО" value={fullName} onChange={e => setFullName(e.target.value)} />
+              <input className="border p-1 w-full" placeholder="Дата рождения" type="date" value={birthDate} onChange={e => setBirthDate(e.target.value)} />
+              <input className="border p-1 w-full" placeholder="Телефон" value={phone} onChange={e => setPhone(e.target.value)} />
+              <input className="border p-1 w-full" placeholder="Telegram username" value={username} onChange={e => setUsername(e.target.value)} />
+              <input className="border p-1 w-full" placeholder="Email" value={regEmail} onChange={e => setRegEmail(e.target.value)} />
+              <input className="border p-1 w-full" placeholder="Пароль" type="password" value={regPassword} onChange={e => setRegPassword(e.target.value)} />
+              <div className="space-x-2">
+                <button className="bg-blue-500 text-white px-3 py-1" onClick={register}>Зарегистрироваться</button>
+                <button className="text-sm" onClick={() => setShowReg(false)}>У меня есть аккаунт</button>
+              </div>
+            </div>
+          );
+        }
         return (
           <div className="space-y-2">
             <h1 className="text-xl font-bold">Вход</h1>
             <input className="border p-1 w-full" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
             <input className="border p-1 w-full" placeholder="Пароль" type="password" value={password} onChange={e => setPassword(e.target.value)} />
-            <button className="bg-blue-500 text-white px-3 py-1" onClick={login}>Войти</button>
+            <div className="space-x-2">
+              <button className="bg-blue-500 text-white px-3 py-1" onClick={login}>Войти</button>
+              <button className="text-sm" onClick={() => setShowReg(true)}>Регистрация</button>
+            </div>
           </div>
         );
       }

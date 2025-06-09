@@ -1,6 +1,6 @@
-# Molpalata Web App
+# Сайт Молодёжной палаты района Некрасовка
 
-This repository contains a simple web application for the youth chamber.
+Простой пример сайта для палаты. Реализована регистрация, вход и просмотр мероприятий.
 
 * `backend_py/` – Python backend using only the standard library and SQLite
 * `backend_node/` – optional Node.js backend
@@ -13,10 +13,11 @@ cd backend_py
 python3 app.py
 ```
 
-The backend also serves the frontend. After starting it, open
-`http://localhost:3001/` in your browser to see the site.
+После запуска сервер будет доступен на `http://localhost:3001/` и отдаст страницу `frontend/index.html`.
 
-The app now shows a simple login form. Create a user via the registration API, for example:
+На сайте можно зарегистрироваться или войти в систему. Регистрация требует ФИО, дату рождения, телефон, Telegram username, e‑mail и пароль.
+
+Пример регистрации через curl:
 
 ```bash
 curl -X POST http://localhost:3001/api/auth/register \
@@ -25,6 +26,8 @@ curl -X POST http://localhost:3001/api/auth/register \
 ```
 
 Then log in using the same email and password. After successful login you will see the list of events.
+
+При создании мероприятия баллы назначаются автоматически в зависимости от категории (например, "meeting" = 10, "social_action" = 6).
 
 ### Node.js backend (optional)
 

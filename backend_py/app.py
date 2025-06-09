@@ -47,6 +47,14 @@ cur.execute('''CREATE TABLE IF NOT EXISTS tokens (
 )''')
 conn.commit()
 
+# Default points for event categories
+CATEGORY_POINTS = {
+    'meeting': 10,
+    'social_action': 6,
+    'social_action_video': 10,
+    'own_event': 16,
+}
+
 
 def hash_password(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
@@ -159,8 +167,11 @@ class Handler(BaseHTTPRequestHandler):
         if not user or user['role'] not in ('admin', 'chairman'):
             self._send_json({'error': 'forbidden'}, status=403)
             return
+        points = data.get('points')
+        if points is None:
+            points = CATEGORY_POINTS.get(data['category'], 0)
         cur.execute('INSERT INTO events(title, datetime, category, points, description) VALUES (?, ?, ?, ?, ?)',
-                    (data['title'], data['datetime'], data['category'], data['points'], data.get('description')))
+                    (data['title'], data['datetime'], data['category'], points, data.get('description')))
         conn.commit()
         self._send_json({'status': 'created'})
 
