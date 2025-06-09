@@ -4,8 +4,11 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import parse_qs, urlparse
 import uuid
 import hashlib
+import os
 
 DB_PATH = 'db.sqlite'
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+INDEX_PATH = os.path.join(BASE_DIR, '..', 'frontend', 'index.html')
 
 conn = sqlite3.connect(DB_PATH, check_same_thread=False)
 conn.row_factory = sqlite3.Row
@@ -99,7 +102,18 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         path = urlparse(self.path).path
-        if path == '/api/events':
+        if path in ('/', '/index.html'):
+            try:
+                with open(INDEX_PATH, 'rb') as f:
+                    body = f.read()
+                self.send_response(200)
+                self.send_header('Content-Type', 'text/html')
+                self.send_header('Content-Length', str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
+            except FileNotFoundError:
+                self._send_json({'error': 'not found'}, status=404)
+        elif path == '/api/events':
             self.handle_get_events()
         elif path == '/api/users':
             self.handle_get_users()

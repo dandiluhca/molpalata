@@ -12,9 +12,12 @@ cd backend_py
 python3 app.py
 ```
 
+The backend also serves the frontend. After starting it, open
+`http://localhost:3001/` in your browser or Telegram WebView to see the mini app.
+
 ## Running tests
 
 ```bash
 cd backend_py
-python3 -m unittest
+python3 -m unittest discover -s tests -v
 ```
