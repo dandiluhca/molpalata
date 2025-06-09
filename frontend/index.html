@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Molpalata Mini App</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="p-4">
+  <div id="root"></div>
+  <script type="text/babel">
+    function App() {
+      const [events, setEvents] = React.useState([]);
+      const tg = window.Telegram.WebApp;
+      React.useEffect(() => {
+        fetch('/api/events', { headers: { 'Authorization': localStorage.getItem('token') }})
+          .then(r => r.json()).then(setEvents);
+      }, []);
+      return (
+        <div>
+          <h1 className="text-xl font-bold mb-4">Мероприятия</h1>
+          <ul>
+            {events.map(e => <li key={e.id} className="mb-2">{e.title} - {e.datetime}</li>)}
+          </ul>
+        </div>
+      );
+    }
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+</body>
+</html>
